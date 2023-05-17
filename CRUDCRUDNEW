@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Expenses Tracker</title>
+    
+  </head>
+  <body>
+    <h1>Expenses Tracker</h1>
+
+    <form>
+      <label for="expenses">Amount:</label>
+      <input type="number" id="expenses"><br>
+
+      <label for="choosedescription">Description:</label>
+      <input type="text" id="choosedescription"><br>
+
+      <label for="expenses-category">Category:</label>
+      <select id="expenses-category">
+        <option value="food">Food</option>
+        <option value="transportation">Transportation</option>
+        <option value="housing">Housing</option>
+        <option value="entertainment">Entertainment</option>
+      </select><br>
+
+      <button type="button">Add Expense</button>
+    </form>
+
+    <h2>Expenses List</h2>
+
+    <ul id="expense-list"></ul>
+    <script src="https://crudcrud.com/api/0b3de3ca47fd4f78aafa65537fe9c58b"></script>
+    <script>
+      const addExpenseBtn = document.querySelector('button');
+      const expenseList = document.querySelector('#expense-list');
+
+      let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+      function displayExpenses() {
+        expenseList.innerHTML = '';
+
+        expenses.forEach((expense, index) => {
+          const expenseItem = document.createElement('li');
+          expenseItem.textContent = `${expense.amount} - ${expense.description} - ${expense.category}`;
+
+          const editBtn = createButton('Edit', () => editExpense(index));
+          expenseItem.appendChild(editBtn);
+
+          const deleteBtn = createButton('Delete', () => deleteExpense(index));
+          expenseItem.appendChild(deleteBtn);
+
+          expenseList.appendChild(expenseItem);
+        });
+      }
+
+      function createButton(text, onClick) {
+        const button = document.createElement('button');
+        button.textContent = text;
+        button.addEventListener('click', onClick);
+        return button;
+      }
+
+      function addExpense() {
+        const expenseAmount = document.querySelector('#expenses').value;
+        const expenseDescription = document.querySelector('#choosedescription').value;
+        const expenseCategory = document.querySelector('#expenses-category').value;
+
+        const expense = {
+          amount: expenseAmount,
+          description: expenseDescription,
+          category: expenseCategory
+        };
+
+        expenses.push(expense);
+        localStorage.setItem('expenses', JSON.stringify(expenses));
+
+        displayExpenses();
+
+        document.querySelector('#expenses').value = '';
+        document.querySelector('#choosedescription').value = '';
+        document.querySelector('#expenses-category').value = '';
+      }
+
+      function editExpense(index) {
+        const expense = expenses[index];
+
+        document.querySelector('#expenses').value = expense.amount;
+        document.querySelector('#choosedescription').value = expense.description;
+        document.querySelector('#expenses-category').value = expense.category;
+
+        expenses.splice(index, 1);
+        localStorage.setItem('expenses', JSON.stringify(expenses));
+
+        displayExpenses();
+      }
+
+      function deleteExpense(index) {
+        expenses.splice(index, 1);
+        localStorage.setItem('expenses', JSON.stringify(expenses));
+
+        displayExpenses();
+      }
+
+      addExpenseBtn.addEventListener('click', addExpense);
+      displayExpenses();
+    </script>
+  </body>
+</html>
